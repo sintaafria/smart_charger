@@ -41,7 +41,8 @@ int set2 = 0;
 int flag_a1=0, flag_a2=0;
 int flag_b1=0, flag_b2=0;
 
-bool buzzerState = LOW;
+bool buzzerState1 = LOW;
+bool buzzerState2 = LOW;
 
 unsigned long previousMillis=0;
 unsigned long startTime1 = 0;
@@ -97,15 +98,22 @@ void loop(){
 tDown.run();
 tdown.run();
 
+
+if ( digitalRead (bt_switch) == 0) {
+  if (buzzerState1 == 1) {
+    buzzerOn(buzzer1, buzzerState1);
+  }
+  if (buzzerState2 == 1) {
+    buzzerOn(buzzer2, buzzerState2);
+  }
+}
+
 if ( digitalRead (bt_switch) == 0) {
   if (flag_a1==0 && flag_a2==0) {
-    uint32_t start_time = millis();
-    if((millis()-start_time) < 100) {
       flag_a1=1;
       switch_set = switch_set + 1;
-//      Serial.println(switch_set);
       if (switch_set >2) {switch_set = 0;}
-   } 
+      delay(100);
   }
 } else {
   flag_a1=0;
@@ -113,13 +121,11 @@ if ( digitalRead (bt_switch) == 0) {
 
 if ( digitalRead (bt_switch) == 0) {
   if (flag_b1==0 && flag_b2==0) {
-    uint32_t start_time = millis();
-    if((millis()-start_time) < 100) {
+//      digitalWrite(buzzer2, LOW);
       flag_b1=1;
       switch_set = switch_set + 1;
-//      Serial.println(switch_set);
       if (switch_set >2) {switch_set = 0;}
-    }
+      delay(100);
   } 
 } else {
   flag_b1=0;
@@ -129,38 +135,41 @@ if ( digitalRead (bt_switch) == 0) {
 if(switch_set==1){
   lcd.setCursor(2,0);
   lcd.print(">");
+  lcd.setCursor(2,1);
+  lcd.print(" ");
   }
 if(switch_set==2){
   lcd.setCursor(2,1);
   lcd.print(">");
+  lcd.setCursor(2,0);
+  lcd.print(" ");
+  }
+if(switch_set==0){
+  lcd.setCursor(2,1);
+  lcd.print(" ");
+  lcd.setCursor(2,0);
+  lcd.print(" ");
   }
   
 if(digitalRead (bt_set) == 0){
   if(flag_a1==0 && flag_a2==0 && switch_set == 1){
-    uint32_t start_time = millis();
-    if((millis()-start_time) < 100) {
     flag_a1=1;
     set1 = set1+1;
-//    Serial.println(set1);
     if(set1>3){set1=0;}
-    }
+    delay(100);
 }
 }else{flag_a1=0;}
 
-if(digitalRead (bt_set) == 0 && switch_set == 2){
-  if(flag_b1==0 && flag_b2==0){
-    uint32_t start_time = millis();
-    if((millis()-start_time) < 100) {
+if(digitalRead (bt_set) == 0){
+  if(flag_b1==0 && flag_b2==0 && switch_set == 2){
       flag_b1=1;
       set2 = set2+1;
       if(set2>3){set2=0;}
-  } 
+      delay(100);
 }
 }else{flag_b1=0;}
 
 if(digitalRead (bt_up) == 0 && switch_set == 1){
-  uint32_t start_time = millis();
-  if((millis()-start_time) < 200) {
     if(set1==0){tdown.start(); flag_a2=1;}
     if(set1==1){time_s1++;}
     if(set1==2){time_m1++;}
@@ -169,12 +178,10 @@ if(digitalRead (bt_up) == 0 && switch_set == 1){
     if(time_m1>59){time_m1=0;}
     if(time_h1>99){time_h1=0;}
     if(set1>0){eeprom_write1();}
-  }
+    delay(100);
 }
 
 if(digitalRead (bt_up) == 0 && switch_set == 2){
-  uint32_t start_time = millis();
-  if((millis()-start_time) < 200) {
   if(set2==0){tDown.start(); flag_b2=1;}
   if(set2==1){time_s2++;}
   if(set2==2){time_m2++;}
@@ -183,12 +190,10 @@ if(digitalRead (bt_up) == 0 && switch_set == 2){
   if(time_m2>59){time_m2=0;}
   if(time_h2>99){time_h2=0;}
   if(set2>0){eeprom_write2();}
-  }
+  delay(100);
 }
 
 if(digitalRead (bt_down) == 0 && switch_set == 1){
-  uint32_t start_time = millis();
-  if((millis()-start_time) < 200) {
   if(set1==0){tdown.stop(); flag_a2=0;}
   if(set1==1){time_s1--;}
   if(set1==2){time_m1--;}
@@ -197,12 +202,10 @@ if(digitalRead (bt_down) == 0 && switch_set == 1){
   if(time_m1<0){time_m1=59;}
   if(time_h1<0){time_h1=99;}
   if(set1>0){eeprom_write1();}
-  }
+  delay(100);
 }
 
 if(digitalRead (bt_down) == 0 && switch_set == 2){
-  uint32_t start_time = millis();
-  if((millis()-start_time) < 200) {
   if(set2==0){tDown.stop(); flag_b2=0;}
   if(set2==1){time_s2--;}
   if(set2==2){time_m2--;}
@@ -211,7 +214,7 @@ if(digitalRead (bt_down) == 0 && switch_set == 2){
   if(time_m2<0){time_m2=59;}
   if(time_h2<0){time_h2=99;}
   if(set2>0){eeprom_write2();}
-  }
+  delay(100);
 }
 
 if(digitalRead (bt_start) == 0 && switch_set == 1){ 
@@ -233,16 +236,16 @@ if(digitalRead (bt_start) == 0 && switch_set == 2){
 }
 
 lcd.setCursor(0,0);
-if(set1==0){lcd.print("T1 ");}
+if(set1==0){lcd.print("T1");}
 lcd.setCursor(6,0);
 if(set1==0){lcd.print("  ");}
 
 lcd.setCursor(14,0);
-if(set1==1 && switch_set==1){lcd.print("__");}
+if(set1==1 && switch_set==1){lcd.print("  ");}
 lcd.setCursor(11,0);
-if(set1==2 && switch_set==1){lcd.print("__");}
+if(set1==2 && switch_set==1){lcd.print("  ");}
 lcd.setCursor(8,0);
-if(set1==3 && switch_set==1){lcd.print("__");}
+if(set1==3 && switch_set==1){lcd.print("  ");}
 
 lcd.setCursor(8,0);
 if(time_h1<=9){lcd.print("0");}
@@ -256,16 +259,16 @@ lcd.print(time_s1);
 lcd.print("   "); 
 
 lcd.setCursor(0,1);
-if(set2==0){lcd.print("T2 ");}
+if(set2==0){lcd.print("T2");}
 lcd.setCursor(6,1);
 if(set2==0){lcd.print("  ");}
 
 lcd.setCursor(14,1);
-if(set1==1 && switch_set==2){lcd.print("__");}
+if(set2==1 && switch_set==2){lcd.print("  ");}
 lcd.setCursor(11,1);
-if(set1==2 && switch_set==2){lcd.print("__");}
+if(set2==2 && switch_set==2){lcd.print("  ");}
 lcd.setCursor(8,1);
-if(set1==3 && switch_set==2){lcd.print("__");}
+if(set2==3 && switch_set==2){lcd.print("  ");}
 
 lcd.setCursor(8,1);
 if(time_h2<=9){lcd.print("0");}
@@ -310,7 +313,7 @@ if(time_s1==0 && time_m1==0 && time_h1==0 && flag_a2==1){
     lcd.setCursor(3,0);
     lcd.print(power_);
   }
-  buzzerOn(buzzer1);
+  buzzerState1 = buzzerOn(buzzer1, buzzerState1);
 }
 
 if(time_s2==0 && time_m2==0 && time_h2==0 && flag_b2==1){
@@ -345,7 +348,7 @@ if(time_s2==0 && time_m2==0 && time_h2==0 && flag_b2==1){
     lcd.setCursor(3,1);
     lcd.print(power_);
   }
-  buzzerOn(buzzer2);
+  buzzerState2 = buzzerOn(buzzer2, buzzerState2);
 }
 
 if(flag_a2==1){digitalWrite(relay1, LOW);}
@@ -380,22 +383,10 @@ time_m2 =  EEPROM.read(5);
 time_h2 =  EEPROM.read(6);
 }
 
-void buzzerOn(int pin){
-  unsigned long firstMillis = millis();
-    while ((unsigned long)(millis() - firstMillis) <= 500) {
-      unsigned long currentMillis = millis(); // grab current time
-      // check if "interval" time has passed (1000 milliseconds)
-      if ((unsigned long)(currentMillis - previousMillis) >= 100) {
-        buzzerState = !buzzerState; // "toggles" the state
-        digitalWrite(pin, buzzerState); // sets the LED based on ledState
-        // save the "current" time
-        previousMillis = millis();
-//        Serial.print(previousMillis);
-//        Serial.print(" pin:");
-//        Serial.println(pin);  
-    }
-  }
-  digitalWrite(pin, LOW);
+int buzzerOn(int pin, bool buzzerState){
+  buzzerState = !buzzerState; // "toggles" the state
+  digitalWrite(pin, buzzerState);
+  return buzzerState;
 }
 
   float getIPP(int numSensor) {
@@ -412,5 +403,10 @@ void buzzerOn(int pin){
       if (readValue < minValue) {minValue = readValue;}
      }
     result = ((maxValue-minValue)*4.6)/1024.0;
+    Serial.println(result);
+    if (result < 0.1) {
+      result = 0;
+    }
+    Serial.println(result);
     return result;
 }
